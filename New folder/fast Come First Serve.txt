@@ -1,0 +1,984 @@
+//fast Come First Serve
+
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    int n,bt[100],wt[100],tat[100],i,j;
+    double avwt=0,avtat=0;
+    cout<<"Enter total number of processes: ";
+    cin>>n;
+
+    cout<<endl<<"Enter Process Burst Time: ";
+    for(i=0;i<n;i++)
+    {
+        cout<<"\nProcess "<<i+1<<": ";
+        cin>>bt[i];
+    }
+
+    wt[0] = 0;
+    for(i=1;i<n;i++)
+    {
+        wt[i] = 0;
+        for(j=0;j<i;j++)
+        {
+            wt[i]+=bt[j];
+        }
+    }
+
+    cout<<endl<<"Process\tBurst Time\tWaiting Time\tTurnaround Time \n";
+
+    for(i=0;i<n;i++)
+    {
+        tat[i]=bt[i]+wt[i];
+        avwt+=wt[i];
+        avtat+=tat[i];
+        cout<<i+1<<"\t\t"<<bt[i]<<"\t\t"<<wt[i]<<"\t\t"<<tat[i]<<endl;
+    }
+
+    avwt/=(n+0.0);
+    avtat/=(n+0.0);
+    cout<<endl<<"Average Waiting Time: "<<avwt;
+    cout<<endl<<"Average Turnaround Time: "<<avtat<<endl;
+    return 0;
+}
+
+
+----------------------------------------------------------------------------------------
+
+
+//Shortest Job first
+
+#include <iostream>
+using namespace std;
+
+int main() {
+	int P[100],BT[100],WT[100] = {0},TAT[100] = {0};
+	int i, j, n, total = 0, index, temp;
+	float avg_wt, avg_tat;
+
+	cout << "Enter number of process: ";
+	cin >> n;
+
+	cout << "Enter Burst Time:" << endl;
+
+	// User Input Burst Time and alloting Process Id.
+	for (i = 0; i < n; i++) {
+		cout << "P" << i + 1 << ": ";
+		cin >> BT[i];
+		P[i] = i+1;
+	}
+
+	// Sorting process according to their Burst Time.
+	for (i = 0; i < n; i++) {
+		for (j = i + 1; j < n; j++){
+           if (BT[i] > BT[j]){
+                temp = BT[i];
+                BT[i] = BT[j];
+                BT[j] = temp;
+
+                temp = P[i];
+                P[i] = P[j];
+                P[j] = temp;
+			}
+		}
+	}
+
+	// Calculation of Waiting Times
+	for (i = 1; i < n; i++) {
+		for (j = 0; j < i; j++){
+            WT[i] += BT[j];
+		}
+		total += WT[i];
+	}
+
+	avg_wt = (float)total / n;
+	total = 0;
+	cout << "P	 BT	 WT	 TAT" << endl;
+
+	// Calculation of Turn Around Time and printing the
+	// data.
+	for (i = 0; i < n; i++) {
+		TAT[i] = BT[i]+WT[i];
+		total += TAT[i];
+		cout << "P" << P[i] << "	 " << BT[i] << "	 " << WT[i] << "	 " << TAT[i] << endl;
+	}
+
+	avg_tat = (float)total / n;
+	cout << "Average Waiting Time= " << avg_wt << endl;
+	cout << "Average Turnaround Time= " << avg_tat << endl;
+}
+
+---------------------------------------------------------------------------------
+
+
+//Round Robin 
+#include<bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n,i,sum = 0,y,AT[100],BT[100],temp[100],wt=0,tat=0,quant;
+    float avg_wt=0,avg_tat=0;
+    bool isProcessing = true;
+    cout<<"Total number of process in system: ";
+    cin>>n;
+    y = n;
+
+    for(i=0;i<n;i++){
+        cout<<"\nEnter arrival time for P"<<i+1<<" : ";
+        cin>>AT[i];
+        cout<<"\nEnter Burst time for P"<<i+1<<" : ";
+        cin>>BT[i];
+        temp[i] = BT[i];
+    }
+    cout<<"\nEnter the time Quantum for process: ";
+    cin>>quant;
+    cout<<endl<<"Process\tBurst Time\tWaiting Time\tTurnaround Time \n";
+    i = 0;
+    while(y!=0){
+        if(temp[i]<=quant && temp[i]>0){
+            sum += temp[i];
+            temp[i] = 0;
+            isProcessing = false;
+        }else if(temp[i]>0)
+        {
+            temp[i] -= quant;
+            sum += quant;
+            isProcessing = true;
+        }
+        if(temp[i] == 0 && !isProcessing){
+            y--;
+            tat = sum-AT[i];
+            wt = tat-BT[i];
+            cout<<"P "<<i+1<<"\t\t"<<BT[i]<<"\t\t"<<wt<<"\t\t"<<tat<<endl;
+            avg_wt+=wt;
+            avg_tat+=tat;
+            isProcessing = true;
+        }
+        if(i == n-1){
+            i = 0;
+        }else if(AT[i]<= sum){
+            i++;
+        }else{
+            i = 0;
+        }
+    }
+}
+
+
+*******************************************************************
+
+
+//Round Robin 
+#include<bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n,i,sum = 0,y,AT[100],BT[100],temp[100],wt=0,tat=0,quant;
+    float avg_wt=0,avg_tat=0;
+    bool isProcessing = true;
+    cout<<"Total number of process in system: ";
+    cin>>n;
+    y = n;
+
+    for(i=0;i<n;i++){
+        cout<<"\nEnter arrival time for P"<<i+1<<" : ";
+        cin>>AT[i];
+        cout<<"\nEnter Burst time for P"<<i+1<<" : ";
+        cin>>BT[i];
+        temp[i] = BT[i];
+    }
+    cout<<"\nEnter the time Quantum for process: ";
+    cin>>quant;
+    cout<<endl<<"Process\tBurst Time\tWaiting Time\tTurnaround Time \n";
+    i = 0;
+    while(y!=0){
+        if(temp[i]<=quant && temp[i]>0){
+            sum+=temp[i];
+            temp[i] = 0;
+            isProcessing = false;
+        }
+        else if(temp[i]>0){
+            temp[i] -= quant;
+            sum+=quant;
+            isProcessing = true;
+        }
+        if(temp[i] == 0 && !isProcessing){
+            y--;
+            tat = sum-AT[i];
+            wt = tat-BT[i];
+            cout<<"P "<<i+1<<"\t\t"<<BT[i]<<"\t\t"<<wt<<"\t\t"<<tat<<endl;
+            avg_wt+=wt;
+            avg_tat+=tat;
+            isProcessing = true;
+        }
+        if(i == n-1){
+            i = 0;
+        }else if(AT[i]<= sum){
+            i++;
+        }else{
+            i = 0;
+        }
+    }
+}
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+//Prioty Shedule
+
+#include<bits/stdc++.h>
+#include <stdio.h>
+using namespace std;
+
+void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+
+void NonPreemetive(){
+    int n;
+    printf("Enter Number of Processes: ");
+    scanf("%d",&n);
+
+    // b is array for burst time, p for priority and index for process id
+    int b[n],p[n],index[n];
+    for(int i=0;i<n;i++)
+    {
+        printf("Enter Burst Time and Priority Value for Process %d: ",i+1);
+        scanf("%d %d",&b[i],&p[i]);
+        index[i]=i+1;
+    }
+    for(int i=0;i<n;i++)
+    {
+        int a=p[i],m=i;
+
+        //Finding out highest priority element and placing it at its desired position
+        for(int j=i;j<n;j++)
+        {
+            if(p[j] > a)
+            {
+                a=p[j];
+                m=j;
+            }
+        }
+
+        //Swapping processes
+        swap(&p[i], &p[m]);
+        swap(&b[i], &b[m]);
+        swap(&index[i],&index[m]);
+    }
+    printf("Process Id     Burst Time   Wait Time    TurnAround Time\n");
+    int wait_time=0;
+    for(int i=0;i<n;i++)
+    {
+        printf("P%d             %d              %d              %d\n",index[i],b[i],wait_time,wait_time + b[i]);
+        wait_time += b[i];
+    }
+}
+
+void Preemetive(){
+    int i,sum = 0,temp[100],wt=0,tat=0,quant;
+    float avg_wt=0,avg_tat=0;
+    bool isProcessing = true;
+    int n,y;
+    printf("Enter Number of Processes: ");
+    scanf("%d",&n);
+
+    cin>>quant;
+    y = n;
+    // b is array for burst time, p for priority and index for process id
+    int b[n],p[n],index[n];
+    for(i=0;i<n;i++)
+    {
+        printf("Enter Burst Time and Priority Value for Process %d: ",i+1);
+        scanf("%d %d",&b[i],&p[i]);
+        index[i]=i+1;
+    }
+    for(i=0;i<n;i++)
+    {
+        int a=p[i],m=i;
+
+        //Finding out highest priority element and placing it at its desired position
+        for(int j=i;j<n;j++)
+        {
+            if(p[j] > a)
+            {
+                a=p[j];
+                m=j;
+            }
+        }
+
+        //Swapping processes
+        swap(&p[i], &p[m]);
+        swap(&b[i], &b[m]);
+        swap(&index[i],&index[m]);
+        temp[i] = b[i];
+    }
+    cout<<endl<<"Process\tBurst Time\tWaiting Time\tTurnaround Time \n";
+    i = 0;
+    while(y!=0){
+        if(temp[i]<=quant && temp[i]>0){
+            sum += temp[i];
+            temp[i] = 0;
+            isProcessing = false;
+        }else if(temp[i]>0)
+        {
+            temp[i] -= quant;
+            sum += quant;
+            isProcessing = true;
+        }
+        if(temp[i] == 0 && !isProcessing){
+            y--;
+            tat = sum;
+            wt = tat-b[i];
+            cout<<"P "<<i+1<<"\t\t"<<b[i]<<"\t\t"<<wt<<"\t\t"<<tat<<endl;
+            avg_wt+=wt;
+            avg_tat+=tat;
+            isProcessing = true;
+        }
+        if(i == n-1){
+            i = 0;
+        }else{
+            i++;
+        }
+    }
+}
+int main()
+{
+    Preemetive();
+    return 0;
+}
+
+
+------------------------------------------------------------------------------
+
+
+
+// Banker's Algorithm
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    // P0, P1, P2, P3, P4 are the Process names here
+
+  int n, m, i, j, k;
+  n = 5; // Number of processes
+  m = 3; // Number of resources
+  int alloc[5][3] = { { 0, 1, 0 }, // P0 // Allocation Matrix
+                     { 2, 0, 0 }, // P1
+                     { 3, 0, 2 }, // P2
+                     { 2, 1, 1 }, // P3
+                     { 0, 0, 2 } }; // P4
+
+  int max[5][3] = { { 7, 5, 3 }, // P0 // MAX Matrix
+                   { 3, 2, 2 }, // P1
+                   { 9, 0, 2 }, // P2
+                   { 2, 2, 2 }, // P3
+                   { 4, 3, 3 } }; // P4
+
+  int avail[3] = { 3, 3, 2 }; // Available Resources
+
+  int f[n], ans[n], ind = 0;
+  for (k = 0; k < n; k++) {
+    f[k] = 0;
+  }
+  int need[n][m];
+  for (i = 0; i < n; i++) {
+    for (j = 0; j < m; j++)
+      need[i][j] = max[i][j] - alloc[i][j];
+  }
+  int y = 0;
+  for (k = 0; k < 5; k++) {
+    for (i = 0; i < n; i++) {
+      if (f[i] == 0) {
+
+        int flag = 0;
+        for (j = 0; j < m; j++) {
+          if (need[i][j] > avail[j]){
+            flag = 1;
+            break;
+          }
+        }
+
+        if (flag == 0) {
+          ans[ind++] = i;
+          for (y = 0; y < m; y++)
+            avail[y] += alloc[i][y];
+          f[i] = 1;
+        }
+      }
+    }
+  }
+
+  int flag = 1;
+
+  // To check if sequence is safe or not
+  for(int i = 0;i<n;i++)
+  {
+        if(f[i]==0)
+      {
+        flag = 0;
+        cout << "The given sequence is not safe";
+        break;
+      }
+  }
+
+  if(flag==1)
+  {
+    cout << "Following is the SAFE Sequence" << endl;
+      for (i = 0; i < n - 1; i++)
+        cout << " P" << ans[i] << " ->";
+      cout << " P" << ans[n - 1] <<endl;
+  }
+
+    return (0);
+}
+
+
+
+-------------------------------------------------------------------------------
+
+
+
+
+//Bounded Buffer
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int mutex = 1;
+int full = 0;
+
+int Empty = 10, x = 0;
+
+void producer()
+{
+	--mutex;
+	++full;
+	--Empty;
+	x++;
+	printf("\nProducer produces item %d",x);
+	++mutex;
+}
+
+void consumer()
+{
+	--mutex;
+	--full;
+	++Empty;
+	printf("\nConsumer consumes item %d",x);
+	x--;
+	++mutex;
+}
+
+// Driver Code
+int main()
+{
+	int n, i;
+	printf("\n1. Press 1 for Producer"
+		"\n2. Press 2 for Consumer"
+		"\n3. Press 3 for Exit");
+
+	while(1) {
+
+		printf("\nEnter your choice:");
+		scanf("%d", &n);
+
+		// Switch Cases
+		switch (n) {
+		case 1:
+			if ((mutex == 1) && (Empty != 0)) {
+				producer();
+			}
+			else {
+				printf("Buffer is full!");
+			}
+			break;
+		case 2:
+			if ((mutex == 1) && (full != 0)) {
+				consumer();
+			}
+			else {
+				printf("Buffer is empty!");
+			}
+			break;
+		case 3:
+			exit(0);
+			break;
+		}
+	}
+}
+
+
+
+------------------------------------------------------------------------------
+
+
+
+//Counting Semaphore
+
+
+#include<bits/stdc++.h>
+using namespace std;
+
+class Semaphore {
+public:
+	int value;
+	bool block;
+    void Set(int v ){
+	    value = v;
+	    block = false;
+	}
+};
+
+queue<Semaphore> q;
+
+void P(Semaphore s)
+{
+	s.value = s.value - 1;
+	if (s.value < 0 ) {
+		s.block = true;
+		q.push(s);
+	}
+	else
+		return;
+}
+
+void V(Semaphore s)
+{
+	s.value = s.value + 1;
+	if (s.value <= 0) {
+		Semaphore p = q.pop();
+		s.block = false;
+	}
+	else
+		return;
+}
+
+int main(){
+    int n;
+    Semaphore p[n];
+    cout<<"Number of Process: ";
+    cin>>n;
+    for(int i=0;i<n;i++){
+        p[i].Set(i+1);
+    }
+}
+
+
+
+-----------------------------------------------------------------------------
+
+
+//First Fit Algorithm
+
+#include<bits/stdc++.h> 
+using namespace std;
+
+int main()
+{
+	int blockSize[] = {100, 500, 200, 300, 600};
+	int processSize[] = {212, 417, 112, 426};
+	int m = sizeof(blockSize) / sizeof(blockSize[0]);
+	int n = sizeof(processSize) / sizeof(processSize[0]);
+	int allocation[n];
+
+	for(int i = 0; i < n; i++){
+        allocation[i] = -1;
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < m; j++)
+		{
+			if (blockSize[j] >= processSize[i])
+			{
+				allocation[i] = j;
+				blockSize[j] -= processSize[i];
+				break;
+			}
+		}
+	}
+
+	cout<<"Number of blocks: "<<m<<endl<<"Number of process: "<<n<<endl;
+
+	cout << "\nProcess No.\tProcess Size\tBlock no.\n";
+	for (int i = 0; i < n; i++)
+	{
+		cout << " " << i+1 << "\t\t"<< processSize[i] << "\t\t";
+		if (allocation[i] != -1)
+			cout << allocation[i] + 1;
+		else
+			cout << "Not Allocated";
+		cout << endl;
+	}
+
+	return 0 ;
+}
+
+
+------------------------------------------------------------------------------
+
+
+//Best Fit Algorithm
+
+#include<bits/stdc++.h> 
+using namespace std;
+
+void bestFit(int blockSize[], int m, int processSize[], int n)
+{
+
+	int allocation[n];
+	for (int i = 0; i < n; i++)
+		allocation[i] = -1;
+
+	for (int i = 0; i < n; i++)
+	{
+		int bestIdx = -1;
+		for (int j = 0; j < m; j++)
+		{
+			if (blockSize[j] >= processSize[i])
+			{
+				if (bestIdx == -1)
+					bestIdx = j;
+				else if (blockSize[bestIdx] > blockSize[j])
+					bestIdx = j;
+			}
+		}
+		if (bestIdx != -1)
+		{
+			allocation[i] = bestIdx;
+			blockSize[bestIdx] -= processSize[i];
+		}
+	}
+
+	cout << "\nProcess No.\tProcess Size\tBlock no.\n";
+	for (int i = 0; i < n; i++)
+	{
+		cout << " " << i+1 << "\t\t" << processSize[i] << "\t\t";
+		if (allocation[i] != -1)
+			cout << allocation[i] + 1;
+		else
+			cout << "Not Allocated";
+		cout << endl;
+	}
+}
+
+int main()
+{
+	int blockSize[] = {100, 500, 200, 300, 600};
+	int processSize[] = {212, 417, 112, 426};
+	int m = sizeof(blockSize) / sizeof(blockSize[0]);
+	int n = sizeof(processSize) / sizeof(processSize[0]);
+
+	cout<<"Number of blocks: "<<m<<endl<<"Number of process: "<<n<<endl;
+
+	bestFit(blockSize, m, processSize, n);
+
+	return 0 ;
+}
+
+
+
+-------------------------------------------------------------------------------
+
+//Worst Fit Algorithm
+
+#include<bits/stdc++.h> 
+using namespace std;
+
+int main()
+{
+    int m,n,i;
+	cout<<"Enter Number of Block: ";
+	cin>>m;
+	cout<<"Enter Number of Process: ";
+	cin>>n;
+
+	int blockSize[m],processSize[n];
+
+	cout<<"Enter block sizes: ";
+	for(i = 0;i<m;i++){
+        cin>>blockSize[i];
+	}
+	cout<<"Enter process sizes: ";
+	for(i = 0;i<n;i++){
+        cin>>processSize[i];
+	}
+
+	cout<<"Number of blocks: "<<m<<endl<<"Number of process: "<<n<<endl;
+
+	int allocation[n];
+	for (int i = 0; i < n; i++)
+		allocation[i] = -1;
+
+	for (int i = 0; i < n; i++)
+	{
+		int bestIdx = -1;
+		for (int j = 0; j < m; j++)
+		{
+			if (blockSize[j] >= processSize[i])
+			{
+				if (bestIdx == -1)
+					bestIdx = j;
+				else if (blockSize[bestIdx] < blockSize[j])
+					bestIdx = j;
+			}
+		}
+		if (bestIdx != -1)
+		{
+			allocation[i] = bestIdx;
+			blockSize[bestIdx] -= processSize[i];
+		}
+	}
+
+	cout << "\nProcess No.\tProcess Size\tBlock no.\n";
+	for (int i = 0; i < n; i++)
+	{
+		cout << " " << i+1 << "\t\t" << processSize[i] << "\t\t";
+		if (allocation[i] != -1)
+			cout << allocation[i] + 1;
+		else
+			cout << "Not Allocated";
+		cout << endl;
+	}
+
+	return 0 ;
+}
+
+
+
+-----------------------------------------------------------------------------
+
+
+//Optimal Page Replacement Algorithm
+
+#include <bits/stdc++.h> //Optimal Page Replacement Algorithm
+using namespace std;
+
+int main()
+{
+	int pg[] = { 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2 };
+	int pn = sizeof(pg) / sizeof(pg[0]);
+	int fn = 4;
+
+	bool isFound;
+	int hit = 0;
+	vector<int> fr;
+	vector<int>::iterator it;
+	for(int i = 0;i<fn;i++){
+        fr.push_back(pg[i]);
+	}
+	for(int i=fn;i<pn;i++){
+        it = fr.begin();
+        isFound = false;
+        for(auto j = fr.begin() ; j != fr.end(); ++j){
+            if(pg[i] == *j){
+                it = j;
+                isFound = true;
+                break;
+            }
+        }
+        if(isFound){
+            hit++;
+        }
+        fr.erase(it);
+        fr.push_back(pg[i]);
+	}
+	cout<<"Number of hits : "<<hit;
+	cout<<"\nNumber of misses : "<<pn-hit;
+	return 0;
+}
+
+
+
+-------------------------------------------------------------------------------
+
+
+
+//least Recently
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1000;
+
+int n, frame_size, pages[N];
+
+void LastRecentlyUsedReplacementAlogorithm(){
+    unordered_set<int> s;
+    unordered_map<int, int> indexs;
+    int page_faults = 0;
+
+    for(int i=0;i<n;i++){
+        if(s.find(pages[i]) != s.end()){
+
+        }else{
+            if(s.size() < frame_size){
+                s.insert(pages[i]);
+                page_faults++;
+            }else{
+                int lru = INT_MAX, val;
+                for(auto it: s){
+                    if(indexs[it]< lru){
+                        lru = indexs[it];
+                        val = it;
+                    }
+                }
+                s.erase(val);
+                s.insert(pages[i]);
+                page_faults++;
+            }
+        }
+        indexs[pages[i]] = i;
+    }
+
+    cout<<"\nTotal Page Faults: "<<page_faults;
+}
+
+int main()
+{
+    LastRecentlyUsedReplacementAlogorithm();
+}
+
+
+--------------------------------------------------------------------
+
+
+//Least recently used algorithm
+#include<bits/stdc++.h> //Least recently used algorithm
+using namespace std;
+const int N=100005;
+
+int n;
+int frame_size;
+int pages[N];
+
+void lru_page_replacement()
+{
+    unordered_set<int> s;
+    unordered_map<int, int> indexes;
+
+    int page_faults = 0;
+    for (int i=0; i<n; i++)
+    {
+
+        if(s.find(pages[i]) != s.end())
+        {
+
+        }
+        else
+        {
+            if (s.size() < frame_size)
+            {
+                s.insert(pages[i]);
+                page_faults++;
+            }
+            else
+            {
+                int lru = INT_MAX, val;
+                for (auto it : s)
+                {
+                    if (indexes[it] < lru)
+                    {
+                        lru = indexes[it];
+                        val = it;
+                    }
+                }
+                s.erase(val);
+                s.insert(pages[i]);
+                page_faults++;
+            }
+        }
+        indexes[pages[i]] = i;
+    }
+
+    cout<<"\nTotal Page Faults: "<<page_faults;
+}
+
+int main()
+{
+    cout<<"Number of Frames: ";
+    cin>>frame_size;
+
+    cout<<"Page Reference Stream Length: ";
+    cin>>n;
+
+    cout<<"Page Reference Stream:\n";
+    for(int i=0; i<n; i++)
+        cin>>pages[i];
+    lru_page_replacement();
+}
+
+
+
+--------------------------------------------------------------------------
+
+
+
+
+//RSA
+#include<bits/stdc++.h>
+using namespace std;
+
+int gcd(int a, int b){
+    int temp;
+    while(1){
+        temp = a%b;
+        if(temp == 0)
+            return b;
+
+        a = b;
+        b = temp;
+    }
+}
+
+int main(){
+    double p,q,n,e,msg,phi,d;
+    cout<<"Enter two prime number: ";
+    cin>>p>>q;
+    cout<<"\nEnter Message Data: ";
+    cin>>msg;
+
+    n = p*q; //public key;
+    phi = (p-1)*(q-1);
+    e = 2;
+    while(e<phi){
+        if(gcd(e, phi) == 1)
+            break;
+        else
+            e++;
+    }
+
+    d = (1.0+(2*phi))/e;
+    double ppt = (pow(msg, e)); ppt = fmod(ppt, n); //private key
+    double oMsg = pow(ppt, d); oMsg = fmod(oMsg, n); // decryption
+
+    cout<<"Encrypt data -> "<<ppt<<endl;
+    cout<<"After Decrypt data-> "<<oMsg<<endl;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
