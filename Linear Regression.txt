@@ -1,108 +1,472 @@
-************************************************* Linear Regression **********************************************
-import pandas as pd
-from sklearn.datasets import load_diabetes
+*******************************Gray and Binary ******************************
 
-diabetes = load_diabetes()
-df = pd.DataFrame(diabetes.data, columns = diabetes.feature_names)
-df['disease_score'] = diabetes.target
-from sklearn.model_selection import train_test_split
-x = df.drop(['disease_score'], axis='columns')
-y = df.disease_score
-x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
-from sklearn.linear_model import LinearRegression
-model = LinearRegression()
-model.fit(x_train,y_train)
-model.score(x_test,y_test)
-
-*************************************************** SVM *********************************************
-import pandas as pd
-from sklearn.datasets import load_breast_cancer
-
-cancer = load_breast_cancer()
-df = pd.DataFrame(cancer.data, columns = cancer.feature_names)
-
-from sklearn.model_selection import train_test_split
-x = df
-y = cancer.target
-
-x_train, x_test, y_train,y_test = train_test_split(x,y,test_size=0.2)
-
-from sklearn.svm import SVC
-model = SVC()
-model.fit(x_train,y_train)
-
-model.score(x_test,y_test)
-
-************************************************ Logistic Regression ************************************
-import pandas as pd
-from sklearn.datasets import load_diabetes
-
-diabetes = load_diabetes()
-df = pd.DataFrame(diabetes.data, columns = diabetes.feature_names)
-df['disease_score'] = diabetes.target
-from sklearn.model_selection import train_test_split
-x = df.drop(['disease_score'], axis='columns')
-y = df.disease_score
-x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
-from sklearn.linear_model import LinearRegression
-model = LinearRegression()
-model.fit(x_train,y_train)
-model.score(x_test,y_test)
-
-********************************************* Decision tree **************************************
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
-
-# Load the Iris dataset
-iris = load_iris()
-X = iris.data
-y = iris.target
-
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Create and train the decision tree classifier
-model = DecisionTreeClassifier()
-model.fit(X_train, y_train)
-
-# Make predictions on the test set
-y_pred = model.predict(X_test)
-
-# Calculate the accuracy of the model
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy:", accuracy)
-
-***************************************************** Clustering ***********************************************
-
-from sklearn.datasets import load_breast_cancer
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 
-# Load the breast cancer dataset
-cancer = load_breast_cancer()
-X = cancer.data
+img = cv2.imread("input_img/img2.jpg")
 
-# Standardize the features
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+height, width, _ = img.shape
 
-# Create and fit the KMeans clustering model
-kmeans = KMeans(n_clusters=2, random_state=42)
-kmeans.fit(X_scaled)
+# Create an empty array to store the grayscale image
+gray_img = np.zeros((height, width), dtype=np.uint8)
 
-# Get the cluster labels
-labels = kmeans.labels_
+# Convert the image to grayscale using a for loop
+for i in range(height):
+    for j in range(width):
+        # Compute the mean of the BGR channels for each pixel
+        gray_img[i][j] = np.mean(img[i][j])
 
-# Plot the clusters (for the first two principal components)
-plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=labels, cmap='viridis', s=50, alpha=0.5)
-plt.xlabel('First Principal Component')
-plt.ylabel('Second Principal Component')
-plt.title('KMeans Clustering of Breast Cancer Dataset')
+# Create a binary image (black and white) based on thresholding
+threshold = 127
+bin_img = np.zeros((height, width), dtype=np.uint8)
+for i in range(height):
+    for j in range(width):
+        if gray_img[i][j] > threshold:  # Compare individual pixel value
+            bin_img[i][j] = 255  # Set white pixel
+
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+plt.title("Original Image")
+
+plt.subplot(1, 3, 2)
+plt.imshow(gray_img, cmap='gray')
+plt.title("Grayscale Image")
+
+plt.subplot(1, 3, 3)
+plt.imshow(bin_img, cmap='gray')
+plt.title("Binary Image")
+
 plt.show()
- 
-**********************************************************************************************
+
+
+
+
+********************************** Add Boundary **************************************
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load the input image
+img = cv2.imread("input_img/img2.jpg")
+
+# Convert the input image to grayscale
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Get the dimensions of the grayscale image
+height, width = gray_img.shape
+
+# Determine the size of the square
+square_size = min(height, width)
+
+# Crop the image to make it square
+cropped_img = gray_img[(height - square_size) // 2 : (height + square_size) // 2,
+                       (width - square_size) // 2 : (width + square_size) // 2]
+
+# Read the cropped grayscale image
+boundary_img = cropped_img
+
+# Define boundary size
+boundary_size = 20
+
+# Get the dimensions of the boundary image
+height, width = boundary_img.shape
+
+# Determine the maximum dimension
+max_dim = max(height, width)
+
+# Create a square image with padding
+square_img = np.zeros((max_dim + 2 * boundary_size, max_dim + 2 * boundary_size), dtype=np.uint8)
+
+# Calculate padding for height and width
+padding_height = (max_dim - height) // 2
+padding_width = (max_dim - width) // 2
+
+# Assign the content of boundary_img to the center of square_img with padding
+square_img[boundary_size + padding_height: boundary_size + padding_height + height,
+           boundary_size + padding_width: boundary_size + padding_width + width] = boundary_img
+
+# Display the result with equal subplot sizes
+plt.figure(figsize=(10, 5))  # Set the size of the figure
+plt.subplot(1, 2, 1)
+plt.imshow(gray_img, cmap='gray')
+plt.title('Original Image')
+plt.axis('off')
+plt.subplot(1, 2, 2)
+plt.imshow(square_img, cmap='gray')
+plt.title('After Adding Boundary')
+plt.axis('off')
+plt.tight_layout()  # Adjust subplot parameters to give specified padding
+plt.show()
+
+
+
+************************************** Diagonal value assign center ************************************
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load the input image
+img = cv2.imread("input_img/img2.jpg")
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Compute the sum of the diagonal elements
+sum_diagonal = np.trace(gray_img)
+
+# Create a square image with dimensions equal to the minimum of height and width
+height, width = gray_img.shape
+min_dim = min(height, width)
+diagonal_img = np.copy(gray_img[:min_dim, :min_dim])
+
+# Set diagonal elements to 0
+np.fill_diagonal(diagonal_img, 0)
+
+print("Total sum of the diagonal values:", sum_diagonal)
+
+# Display the diagonal image
+plt.imshow(diagonal_img, cmap='gray')
+plt.title('After Adding Diagonal Value')
+plt.axis('off')
+plt.show()
+
+
+
+********************************* Image inhancement Arithmatic op **************************
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Read two grayscale images
+img1 = cv2.imread("input_img/gray3.jpg", 0)
+img2 = cv2.imread("input_img/gray2.jpg", 0)
+
+# Resize the second image to match the dimensions of the first image
+resize_img = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
+
+# Initialize an array for the resultant image
+res_img = np.zeros_like(img1, dtype=np.int32)
+
+# Perform pixel-wise subtraction of the two images
+for i in range(img1.shape[0]):
+    for j in range(img1.shape[1]):
+        res_img[i][j] = np.int32(img1[i][j]) - np.int32(resize_img[i][j])
+
+# Clip the resultant image to the range [0, 255] and convert to uint8
+res_img = np.clip(res_img, 0, 255).astype("uint8")
+
+# Display the original images and the resultant image
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 3, 1)
+plt.imshow(img1, cmap='gray')
+plt.title('First Image')
+
+plt.subplot(1, 3, 2)
+plt.imshow(img2, cmap='gray')
+plt.title('Second Image')
+
+plt.subplot(1, 3, 3)
+plt.imshow(res_img, cmap='gray')
+plt.title('Resultant Image')
+
+plt.show()
+
+
+
+******************************************* Histogram *********************************
+
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+def hist_equi_img(img, Tx):
+    """
+    Apply histogram equalization transformation to the input image.
+
+    Parameters:
+    - img: Input grayscale image.
+    - Tx: Transformation function representing the mapping of input intensity values to output intensity values.
+
+    Returns:
+    - equi_img: Equalized image.
+    """
+    height, width = img.shape
+    equi_img = np.zeros((height, width), "uint8")
+
+    for i in range(height):
+        for j in range(width):
+            equi_img[i][j] = Tx[img[i][j]]
+
+    return equi_img
+
+def drawHist(img):
+    """
+    Compute the histogram and cumulative distribution function (CDF) of the input image.
+
+    Parameters:
+    - img: Input grayscale image.
+
+    Returns:
+    - hist: Histogram of the image.
+    - cdfTx: Cumulative distribution function (CDF) of the histogram.
+    """
+    height, width = img.shape
+    hist = np.zeros((256))
+    cdfTx = np.zeros((256))
+
+    pre_sum = 0
+
+    for i in range(256):
+        hist[i] = np.sum(img == i)
+        pre_sum += hist[i]
+        cdfTx[i] = pre_sum
+
+    hist = hist / (height * width)
+    cdfTx = cdfTx * 255 / (height * width)
+    cdfTx = cdfTx.astype("uint8")
+
+    return hist, cdfTx
+
+# Load the input image
+img = cv2.imread("input_img/img2.jpg")
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Compute the histogram and CDF of the original image
+hist, cdfTx = drawHist(gray_img)
+
+# Apply histogram equalization
+equi_img = hist_equi_img(gray_img, cdfTx)
+
+# Plotting original and equalized images
+plt.figure(figsize=(10, 5))
+
+# Original image
+plt.subplot(2, 2, 1)
+plt.imshow(gray_img, cmap='gray')
+plt.title('Original Image')
+plt.axis('off')
+
+# Equalized image
+plt.subplot(2, 2, 2)
+plt.imshow(equi_img, cmap='gray')
+plt.title('Equalized Image')
+plt.axis('off')
+
+# Original histogram
+plt.subplot(2, 2, 3)
+x = np.arange(256)
+plt.bar(x, hist, width=0.5)
+plt.title('Original Histogram')
+plt.xlabel('Pixel Value')
+plt.ylabel('Frequency')
+
+# Equalized histogram
+plt.subplot(2, 2, 4)
+hist_equi, _ = drawHist(equi_img)
+plt.bar(x, hist_equi, width=0.5)
+plt.title('Equalized Histogram')
+plt.xlabel('Pixel Value')
+plt.ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+
+
+**************************** Image Filtering **************************************
+
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load the input image
+img = cv2.imread("input_img/img2.jpg")
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Initialize arrays for smoothed and sharpened images
+smooth_img = np.zeros_like(gray_img)
+sharp_img = np.zeros_like(gray_img)
+
+# Define kernels for image smoothing and sharpening
+smooth_kernel = np.array([[1, 2, 1],[2, 4, 2], [1, 2, 1]]) / 16
+sharp_kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, - 1, 0]])
+
+# Perform image smoothing
+for i in range(1, gray_img.shape[0] - 1):
+    for j in range(1, gray_img.shape[1] - 1):
+        smooth_img[i][j] = np.sum(gray_img[i - 1 : i + 2, j - 1: j + 2] * smooth_kernel)
+
+# Perform image sharpening
+for i in range(1, gray_img.shape[0] - 1):
+    for j in range(1, gray_img.shape[1] - 1):
+        sharp_img[i][j] = np.sum(gray_img[i- 1 : i + 2, j - 1 : j + 2] * sharp_kernel)
+
+# Clip pixel values to the range [0, 255] and convert to uint8
+smooth_img = np.clip(smooth_img, 0, 255).astype(np.uint8)
+sharp_img = np.clip(sharp_img, 0, 255).astype(np.uint8)
+
+# Display the original, smoothed, and sharpened images
+plt.figure(figsize=(20, 5))
+plt.subplot(1, 3, 1)
+plt.imshow(gray_img, cmap='gray')
+plt.title('Original Image')
+plt.subplot(1, 3, 2)
+plt.imshow(smooth_img, cmap='gray')
+plt.title('Smoothing Image')
+plt.subplot(1, 3, 3)
+plt.imshow(sharp_img, cmap='gray')
+plt.title('Sharp Image')
+plt.tight_layout()
+plt.show()
+
+
+*************************** Morphologocal ************************************* 
+
+
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+def dilation(kernel, morph_img):
+    """
+    Perform dilation operation on the input image using the specified kernel.
+
+    Parameters:
+    - kernel: Structuring element for dilation.
+    - morph_img: Input binary image.
+
+    Returns:
+    - new_img: Resulting image after dilation.
+    """
+    img_height, img_width = morph_img.shape
+    kernel_height, kernel_width = kernel.shape
+    new_img = np.zeros((img_height - kernel_height + 1, img_width - kernel_width + 1), dtype=np.uint8)
+
+    for i in range(new_img.shape[0]):
+        for j in range(new_img.shape[1]):
+            new_img[i, j] = np.max(morph_img[i:i + kernel_height, j:j + kernel_width] * kernel)
+
+    return new_img
+
+def erosion(kernel, morph_img):
+    """
+    Perform erosion operation on the input image using the specified kernel.
+
+    Parameters:
+    - kernel: Structuring element for erosion.
+    - morph_img: Input binary image.
+
+    Returns:
+    - new_img: Resulting image after erosion.
+    """
+    img_height, img_width = morph_img.shape
+    kernel_height, kernel_width = kernel.shape
+    new_img = np.zeros((img_height - kernel_height + 1, img_width - kernel_width + 1), dtype=np.uint8)
+
+    for i in range(new_img.shape[0]):
+        for j in range(new_img.shape[1]):
+            new_img[i, j] = np.min(morph_img[i:i + kernel_height, j:j + kernel_width] * kernel)
+
+    return new_img
+
+# Define the kernel for morphological operations
+kernel = np.ones((10, 10))
+
+# Load the input image
+morph_img = cv2.imread("input_img/img2.jpg", 0)
+
+# Perform morphological operations and display the results
+plt.figure(figsize=(20, 13))
+
+# Original image
+plt.subplot(1, 5, 1)
+plt.imshow(morph_img, cmap='gray')
+plt.title('Original Image')
+
+# Dilation
+plt.subplot(1, 5, 2)
+plt.imshow(dilation(kernel, morph_img), cmap='gray')
+plt.title('After Dilation')
+
+# Erosion
+plt.subplot(1, 5, 3)
+plt.imshow(erosion(kernel, morph_img), cmap='gray')
+plt.title('After Erosion')
+
+# Opening
+plt.subplot(1, 5, 4)
+opening_img = dilation(kernel, erosion(kernel, morph_img))
+plt.imshow(opening_img, cmap='gray')
+plt.title('After Opening')
+
+# Closing
+plt.subplot(1, 5, 5)
+closing_img = erosion(kernel, dilation(kernel, morph_img))
+plt.imshow(closing_img, cmap='gray')
+plt.title('After Closing')
+
+plt.tight_layout()
+plt.show()
+
+
+****************************** Contrast ******************************
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def contrast_stretching(gray_img, r1, r2, s1, s2):
+    contrast_img = np.zeros_like(gray_img, dtype=np.float64)
+
+    a = s1 / r1
+    b = (s2 - s1) / (r2 - r1)
+    c = (255 - s2) / (255 - r2)
+
+    for i in range(gray_img.shape[0]):
+        for j in range(gray_img.shape[1]):
+            if gray_img[i][j] < r1:
+                contrast_img[i][j] = a * gray_img[i][j]
+            elif gray_img[i][j] < r2:
+                contrast_img[i][j] = b * (gray_img[i][j] - r1) + s1
+            else:
+                contrast_img[i][j] = c * (gray_img[i][j] - r2) + s2
+
+    contrast_img = np.clip(contrast_img, 0, 255).astype(np.uint8)
+
+    return contrast_img
+
+
+# Load the input image
+img = cv2.imread("input_img/img2.jpg")
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# Define contrast stretching parameters
+r1 = int(input('Enter r1 : '))
+r2 = int(input('Enter r2 : '))
+s1 = int(input('Enter s1 : '))
+s2 = int(input('Enter s2 : '))
+
+# Apply contrast stretching
+contrast_img = contrast_stretching(gray_img, r1, r2, s1, s2)
+
+# Display the results
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.imshow(gray_img, cmap='gray')
+plt.title('Original Grayscale Image')
+plt.subplot(1, 2, 2)
+plt.imshow(contrast_img, cmap='gray')
+plt.title('Contrast Image')
+plt.show()
+
+
+******************************** xxx *********************************
 
 
